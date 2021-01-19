@@ -3,7 +3,6 @@ function(auto_targets project_name include_dirs header_dir source_files header_f
   add_library(${project_name} SHARED ${source_files})
   list(APPEND targets ${project_name})
   target_include_directories(${project_name} PUBLIC ${include_dirs})
-  
 
   set_target_properties(${project_name} PROPERTIES PUBLIC_HEADER "${header_files}")
   install(TARGETS ${project_name}

@@ -53,6 +53,10 @@ tstring& rtrim(tstring& ts, const char* trim_char) {
   return ts;
 }
 
+tstring& trim(tstring& ts, const char* trim_char) {
+  return ltrim(ts, trim_char), rtrim(ts, trim_char);
+}
+
 tstring& trim_quotes(tstring& ts) {
   trim(ts);
   cut_front_back(ts, "'", "'");

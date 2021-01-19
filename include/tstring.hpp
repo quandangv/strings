@@ -69,6 +69,7 @@ std::strong_ordering tstring::compare(const T& other) const {
 
 tstring& ltrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
 tstring& rtrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
+tstring& trim(tstring& ts, const char* trim_char = "\r\n\t\v\f ");
 tstring& trim_quotes(tstring&);
 
 bool cut_front(tstring&, const char* front);
@@ -88,9 +89,6 @@ inline tstring substr(const tstring& ts, size_t offset, size_t length)
 
 inline tstring trim_quotes(tstring&& ts)
 { return trim_quotes(ts); }
-
-inline tstring& trim(tstring& ts, const char* trim_char = "\r\n\t\v\f ")
-{ return ltrim(ts, trim_char), rtrim(ts, trim_char); }
 
 inline tstring trim(tstring&& ts, const char* trim_char = "\r\n\t\v\f ")
 { return trim(ts, trim_char); }
