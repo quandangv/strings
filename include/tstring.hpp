@@ -12,11 +12,10 @@ using std::string;
 class tstring {
   // This class doesn't copy string data on construction.
   // Thus it will be invalidated as soon as the original string go out of scope
+  template<typename T> std::strong_ordering compare(const T&) const;
 protected:
   const char* data;
   size_t pos, end_pos;
-
-  template<typename T> std::strong_ordering compare(const T&) const;
 public:
   static constexpr size_t npos = -1;
 
@@ -41,13 +40,13 @@ public:
   tstring interval(size_t start, size_t end) const;
   tstring interval(size_t start) const { return interval(start, end_pos); }
 
-  tstring& set(const string&);
-  tstring& erase_front(size_t = 1);
-  tstring& erase_back(size_t = 1);
-  tstring& set_length(size_t);
+  void set(const string&);
+  void erase_front(size_t = 1);
+  void erase_back(size_t = 1);
+  void set_length(size_t);
 
   // linear time operations
-  tstring& erase(string& source, size_t offset, size_t length = -1);
+  void erase(string& source, size_t offset, size_t length = -1);
   bool operator==(const tstring& s) const { return compare(s) == 0; }
   bool operator==(const string& s) const { return compare(s) == 0; }
   bool operator<(const tstring& s) const { return compare(s) < 0; }
@@ -56,6 +55,17 @@ public:
   bool operator>=(const tstring& s) const { return compare(s) >= 0; }
   operator string() const;
 };
+
+template<typename T>
+std::strong_ordering tstring::compare(const T& other) const {
+  auto len = length();
+  if (auto diff = other.length() <=> len; diff != 0)
+    return diff;
+  for(size_t i = 0; i < len; i++)
+    if (auto diff = other[i] <=> (*this)[i]; diff != 0)
+      return diff;
+  return std::strong_ordering::equal;
+}
 
 tstring& ltrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
 tstring& rtrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
@@ -70,10 +80,11 @@ bool find_enclosed(tstring&, string& source,
                    const string& start_group, const string& end_group,
                    size_t& start, size_t& end);
 
-tstring substr(const tstring&, size_t offset, size_t length);
-
 size_t find(const tstring&, char);
 size_t rfind(const tstring&, char);
+
+inline tstring substr(const tstring& ts, size_t offset, size_t length)
+{ return ts.interval(offset, offset + length); }
 
 inline tstring trim_quotes(tstring&& ts)
 { return trim_quotes(ts); }
@@ -93,13 +104,3 @@ inline string operator+(const string& a, const tstring& b)
 inline std::ostream& operator<<(std::ostream& os, const tstring& ts)
 { return os << static_cast<string>(ts); }
 
-template<typename T>
-std::strong_ordering tstring::compare(const T& other) const {
-  auto len = length();
-  if (auto diff = other.length() <=> len; diff != 0)
-    return diff;
-  for(size_t i = 0; i < len; i++)
-    if (auto diff = other[i] <=> (*this)[i]; diff != 0)
-      return diff;
-  return std::strong_ordering::equal;
-}

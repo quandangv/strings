@@ -226,10 +226,5 @@ TEST(TString, other) {
   EXPECT_EQ(string("").length(), tstring(move(str)).length());
   EXPECT_EQ(string("").length(), tstring("").length());
   EXPECT_EQ(string(""), tstring(""));
-
-  str = "123456";
-  EXPECT_EQ(string("").length(), tstring(move(str)).erase_front(9).length());
-  EXPECT_EQ(string("").length(), tstring("123456").erase_front(9).length());
-  EXPECT_EQ(string(""), tstring("123456").erase_front(9));
 }
 

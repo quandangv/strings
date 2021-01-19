@@ -23,6 +23,7 @@ set(HEADERS
 # source files
 set(SOURCES
   ${SRC_DIR}/tstring.cpp
+  ${SRC_DIR}/tstring_utils.cpp
   ${SRC_DIR}/token_iterator.cpp
 )
 
