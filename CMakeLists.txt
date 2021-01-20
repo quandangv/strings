@@ -7,11 +7,15 @@ project(strings VERSION 1.1.0)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 include(file_list)
 
-include(cmake/targets)
+option(BUILD_STATIC "Only build a static library")
 
-if(BUILD_TESTS)
-  include(cmake/test)
+if(BUILD_STATIC)
+  include(cmake/static_targets)
+else()
+  include(cmake/targets)
+  if(BUILD_TESTS)
+    include(cmake/test)
+  endif()
 endif()
 
 unset(DEBUG_SCOPES CACHE)
-
