@@ -1,10 +1,10 @@
 # paths to various directories
 get_filename_component(GENERATED_HEADERS_DIR ${CMAKE_BINARY_DIR}/generated-headers ABSOLUTE)
-get_filename_component(PUBLIC_HEADERS_DIR   ${CMAKE_SOURCE_DIR}/include ABSOLUTE)
-get_filename_component(PRIVATE_HEADERS_DIR  ${CMAKE_SOURCE_DIR}/private-headers ABSOLUTE)
-get_filename_component(SRC_DIR              ${CMAKE_SOURCE_DIR}/src ABSOLUTE)
-get_filename_component(TEST_DIR             ${CMAKE_SOURCE_DIR}/test ABSOLUTE)
-get_filename_component(LIBRARY_DIR          ${CMAKE_SOURCE_DIR}/lib ABSOLUTE)
+get_filename_component(PUBLIC_HEADERS_DIR   ${CMAKE_CURRENT_LIST_DIR}/include ABSOLUTE)
+get_filename_component(PRIVATE_HEADERS_DIR  ${CMAKE_CURRENT_LIST_DIR}/private-headers ABSOLUTE)
+get_filename_component(SRC_DIR              ${CMAKE_CURRENT_LIST_DIR}/src ABSOLUTE)
+get_filename_component(TEST_DIR             ${CMAKE_CURRENT_LIST_DIR}/test ABSOLUTE)
+get_filename_component(LIBRARY_DIR          ${CMAKE_CURRENT_LIST_DIR}/lib ABSOLUTE)
 set(INCLUDE_DIRS ${PUBLIC_HEADERS_DIR} ${PRIVATE_HEADERS_DIR} ${GENERATED_HEADERS_DIR})
 
 # configure files {{{
