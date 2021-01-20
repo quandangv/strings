@@ -32,4 +32,4 @@ set(TOKEN_ITERATOR_SOURCES
 set(SOURCES ${TSTRING_SOURCES} ${TOKEN_ITERATOR_SOURCES})
 
 # tests
-set(EXTERNAL_TESTS tstring)
+set(EXTERNAL_TESTS tstring string_interpolate)
