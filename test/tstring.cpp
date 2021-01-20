@@ -4,7 +4,6 @@
 #include <vector>
 #include <tuple>
 
-using namespace ::testing;
 using comp_test = pair<string, string>;
 
 TEST(TString, other) {
@@ -61,7 +60,6 @@ TEST_P(CompTest, comp_equality) {
 
 using trim_test = pair<string, string>;
 class TrimTest : public Test, public WithParamInterface<trim_test> {};
-
 vector<trim_test> trim_tests = {
   { "   abcdef ", "abcdef" },
   { "   abc def ", "abc def" },
@@ -265,46 +263,30 @@ TEST_P(find_test_intf, find) {
       << "Source: " << src<< ", character: " << testset.c;
 }
 
-struct limit_cut_test { string source; char c; string result, remain; bool fail; };
-
-class front_limit_cut_test_intf : public Test, public WithParamInterface<limit_cut_test> {};
-vector<limit_cut_test> front_limit_cut_tests = {
-  {"hsv:ff0000", ':', "hsv", "ff0000"},
-  {":ff0000", ':', "", "ff0000"},
-  {"ff0000", ':', "", "ff0000", true},
-  {"hsv::ff0000", ':', "hsv", ":ff0000"},
+struct limit_cut_test : public TestWithParam<int> {
+  template<tstring (*Func)(tstring&, char)>
+  void test(const string& source, char c, const string& result, const string& remain, bool fail = false) {
+    tstring src(source);
+    tstring real_result(Func(src, c));
+    if (fail) EXPECT_TRUE(real_result.untouched())
+        << "Source: " << src << ", character: " << c;
+    else EXPECT_EQ(real_result, result)
+        << "Source: " << src << ", character: " << c;
+    EXPECT_EQ(src, remain)
+        << "Source: " << src << ", character: " << c;
+  }
 };
-INSTANTIATE_TEST_SUITE_P(TString, front_limit_cut_test_intf, ValuesIn(front_limit_cut_tests));
-TEST_P(front_limit_cut_test_intf, front_limit_cut) {
-  auto testset = GetParam();
-  tstring src(testset.source);
-  tstring result(cut_front(src, testset.c));
-  if (testset.fail)
-    EXPECT_TRUE(result.untouched());
-  else
-    EXPECT_EQ(result, testset.result)
-        << "Source: " << src<< ", character: " << testset.c;
-  EXPECT_EQ(src, testset.remain)
-      << "Source: " << src<< ", character: " << testset.c;
+INSTANTIATE_TEST_SUITE_P(tstring, limit_cut_test, ValuesIn({0}));
+
+TEST_P(limit_cut_test, front_limit_cut) {
+  test<cut_front>("hsv:ff0000", ':', "hsv", "ff0000");
+  test<cut_front>(":ff0000", ':', "", "ff0000");
+  test<cut_front>("ff0000", ':', "", "ff0000", true);
+  test<cut_front>("hsv::ff0000", ':', "hsv", ":ff0000");
 }
-
-vector<limit_cut_test> back_limit_cut_tests = {
-  {"ff0000:hsv", ':', "hsv", "ff0000"},
-  {"ff0000:", ':', "", "ff0000"},
-  {"ff0000", ':', "", "ff0000", true},
-  {"ff0000::hsv", ':', "hsv", "ff0000:"},
-};
-class back_limit_cut_test_intf : public Test, public WithParamInterface<limit_cut_test> {};
-INSTANTIATE_TEST_SUITE_P(TString, back_limit_cut_test_intf, ValuesIn(back_limit_cut_tests));
-TEST_P(back_limit_cut_test_intf, back_limit_cut) {
-  auto testset = GetParam();
-  tstring src(testset.source);
-  tstring result(cut_back(src, testset.c));
-  if (testset.fail)
-    EXPECT_TRUE(result.untouched());
-  else
-    EXPECT_EQ(result, testset.result)
-        << "Source: " << src<< ", character: " << testset.c;
-  EXPECT_EQ(src, testset.remain)
-      << "Source: " << src<< ", character: " << testset.c;
+TEST_P(limit_cut_test, back_limit_cut) {
+  test<cut_back>("ff0000:hsv", ':', "hsv", "ff0000");
+  test<cut_back>("ff0000:", ':', "", "ff0000");
+  test<cut_back>("ff0000", ':', "", "ff0000", true);
+  test<cut_back>("ff0000::hsv", ':', "hsv", "ff0000:");
 }

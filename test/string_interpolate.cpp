@@ -2,9 +2,8 @@
 #include "test.h"
 
 TEST(Stringinter, basic) {
-  string_inter si;
-  si.base = "Hello  world, !";
-  si.positions = {6, 14};
+  auto base = "Hello  world, !";
+  vector<size_t> positions = {6, 14};
   vector<string> rep{"awful", "human"};
-  EXPECT_EQ("Hello awful world, human!", si.get(rep));
+  EXPECT_EQ("Hello awful world, human!", interpolate(base, positions, rep));
 }
