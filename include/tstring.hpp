@@ -23,8 +23,9 @@ public:
   tstring(const char* data, size_t pos, size_t end_pos) : data(data), pos(pos), end_pos(end_pos) {}
   tstring() : tstring(nullptr, 0, 0) {}
   tstring(const tstring& s) : tstring(s.data, s.pos, s.end_pos) {}
+  tstring(const string& s, size_t pos) : tstring(s.data(), pos, s.size()) {}
   explicit tstring(const char* data) : tstring(data, 0, strlen(data)) {}
-  explicit tstring(const string& s) : tstring(s.c_str(), 0, s.size()) {}
+  explicit tstring(const string& s) : tstring(s.data(), 0, s.size()) {}
 
   size_t length() const;
   size_t size() const { return length(); }
