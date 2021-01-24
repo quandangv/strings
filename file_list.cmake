@@ -17,8 +17,8 @@ set(INCLUDE_DIRS ${PUBLIC_HEADERS_DIR} ${PRIVATE_HEADERS_DIR} ${GENERATED_HEADER
 
 # public headers
 set(PUBLIC_HEADERS
-  ${PUBLIC_HEADER_DIR}/tstring.hpp
-  ${PUBLIC_HEADER_DIR}/token_iterator.hpp
+  ${PUBLIC_HEADERS_DIR}/tstring.hpp
+  ${PUBLIC_HEADERS_DIR}/token_iterator.hpp
 )
 
 # source files

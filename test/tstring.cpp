@@ -214,27 +214,28 @@ TEST_P(erase_mid_test_intf, erase_mid) {
 }
 
 struct find_enclosed_test {
-  string source, start_group, end_group;
+  string source, start_group, false_start, end_group;
   size_t offset, result_start, result_end;
   bool fail;
 };
 class find_enclosed_test_intf : public Test, public WithParamInterface<find_enclosed_test> {};
 
 vector<find_enclosed_test> find_enclosed_tests = {
-  {"${2345}${9}", "${", "}", 0, 0, 7},
-  {"${2345}${9} ", "${", "}", 7, 0, 4},
-  {"${2345}${9}", "${", "}", 2, 5, 9},
-  {"$${3456}${}", "${", "}", 0, 1, 8},
-  {"\\${2345}${9}", "${", "}", 0, 7, 11},
-  {"$$2345;$$$A;;", "$$", ";", 2, 5, 10},
-  {"$$2345;$A;;", "$$", ";", 2, 5, 10, true},
+  {"${2345}${9}", "${", "${", "}", 0, 0, 7},
+  {"${2%{hello}345}${9}", "${", "{", "}", 0, 0, 15},
+  {"${2345}${9} ", "${", "{", "}", 7, 0, 4},
+  {"${2345}${9}", "${", "${", "}", 2, 5, 9},
+  {"$${3456}${}", "${", "{", "}", 0, 1, 8},
+  {"\\${2345}${9}", "${", "${", "}", 0, 7, 11},
+  {"$$2345;$$$A;;", "$$", "{", ";", 2, 5, 10},
+  {"$$2345;$A;;", "$$", "$", ";", 2, 5, 10, true},
 };
 INSTANTIATE_TEST_SUITE_P(TString, find_enclosed_test_intf, ValuesIn(find_enclosed_tests));
 TEST_P(find_enclosed_test_intf, find) {
   auto testset = GetParam();
   tstring src(testset.source.data(), testset.offset, testset.source.size());
   size_t start, end;
-  ASSERT_EQ(find_enclosed(src, testset.source, testset.start_group, testset.end_group, start, end), !testset.fail)
+  ASSERT_EQ(find_enclosed(src, testset.source, testset.start_group, testset.false_start, testset.end_group, start, end), !testset.fail)
       << "Source: " << src<< ", start: " << testset.offset;
   if (!testset.fail) {
     ASSERT_EQ(start, testset.result_start)
