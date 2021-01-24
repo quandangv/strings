@@ -14,23 +14,45 @@ tstring::operator string() const {
   return string(&*begin(), size());
 }
 
+bool find_enclosed(tstring& str, string& source,
+                   const string& start_group,
+                   const string& end_group,
+                   size_t& start, size_t& end) {
+  return find_enclosed(str, source, start_group, start_group, end_group, start, end);
+}
+
 bool find_enclosed(tstring& str, string& src,
-                   const string& start_group, const string& end_group,
+                   const string& start_group, const string& false_start_group,
+                   const string& end_group,
                    size_t& start, size_t& end) {
   size_t opening_count = 0;
+  start = string::npos;
   auto ptr = str.begin(),
-       start_limit = str.end() + 1 - std::max(start_group.size(), end_group.size()),
+       start_limit = str.end() + 1 - start_group.size() - end_group.size(),
+       false_start_limit = str.end() + 1 - false_start_group.size() - end_group.size(),
        end_limit = str.end() + 1 - end_group.size();
   for(; ptr < end_limit; ptr++) {
-    if (ptr < start_limit && std::equal(start_group.data(), start_group.data() + start_group.size(), ptr)) {
+    auto compare = [&](const string& str) {
+      return std::equal(str.data(), str.data() + str.size(), ptr);
+    };
+
+    if (ptr < start_limit && compare(start_group)) {
+      // Detected start group
       if (ptr > str.begin() && ptr[-1] == '\\') {
         str.erase(src, --ptr - str.begin(), 1);
       } else if (opening_count++ == 0)
         start = ptr - str.begin();
       ptr += start_group.size() - 1;
-    } else if (std::equal(end_group.data(), end_group.data() + end_group.size(), ptr)) {
+
+    } else if (ptr < false_start_limit && compare(false_start_group)) {
+      // Detected false start group
+      opening_count++;
+      ptr += false_start_group.size() - 1;
+
+    } else if (compare(end_group)) {
+      // Detected end group
       ptr += end_group.size() - 1;
-      if (opening_count > 0 && --opening_count == 0) {
+      if (opening_count > 0 && --opening_count == 0 && start != string::npos) {
         end = ptr - str.begin() + 1;
         return true;
       }

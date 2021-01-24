@@ -77,8 +77,15 @@ bool cut_back(tstring&, const char* back);
 bool cut_front_back(tstring&, const char* front, const char* back = "");
 tstring cut_front(tstring&, char limit);
 tstring cut_back(tstring&, char limit);
+
 bool find_enclosed(tstring&, string& source,
-                   const string& start_group, const string& end_group,
+                   const string& start_group, const string& false_start_group,
+                   const string& end_group,
+                   size_t& start, size_t& end);
+
+bool find_enclosed(tstring&, string& source,
+                   const string& start_group,
+                   const string& end_group,
                    size_t& start, size_t& end);
 
 size_t find(const tstring&, char);
