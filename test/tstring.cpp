@@ -7,7 +7,9 @@
 using comp_test = pair<string, string>;
 
 TEST(TString, other) {
-  string str;
+  string str = "  hello  ";
+
+  EXPECT_EQ("  hello  ", tstring(str));
 
   str = "123456789";
   EXPECT_EQ(string("123456789").length(), tstring(move(str)).length());

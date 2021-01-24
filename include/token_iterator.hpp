@@ -18,12 +18,23 @@ struct token_iterator {
   tstring current;
   tstring token;
 
-  token_iterator& set_input(std::string&&, size_t position = 0);
-  bool have_token();
-  bool next_token();
-  template<int (*F)(int)> bool next_token_base()
-  { token = get_token<F>(current); return !token.untouched(); }
-  static int word_char(int c) { return !std::isspace(c) && c != '"' && c != '\''; }
+  static int 
+  word_char(int c) { return !std::isspace(c) && c != '"' && c != '\''; }
+
+  token_iterator& 
+  set_input(std::string&&, size_t position = 0);
+
+  template<int (*F)(int)> bool
+  have_token_base();
+
+  bool 
+  have_token() { return have_token_base<word_char>(); }
+
+  template<int (*F)(int)> bool
+  next_token_base() { token = get_token<F>(current); return !token.untouched(); }
+
+  bool 
+  next_token() { return !(token = get_token<word_char>(current)).untouched(); }
 };
 
 //
@@ -74,5 +85,13 @@ tstring get_token(tstring& str) {
     }
   }
   return tstring();
+}
+
+template<int (*F)(int)>
+bool token_iterator::have_token_base() {
+  for(; !current.empty(); current.erase_front())
+    if (F(current.front()))
+      return true;
+  return false;
 }
 

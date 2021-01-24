@@ -26,24 +26,34 @@ TEST_P(get_token_test, general) {
 }
 
 struct token_iterator_test : public TestWithParam<int> {
+  template<int(*Func)(int)>
   void test(string input, vector<string> words) {
     token_iterator ti{move(input)};
     if (!words.empty())
-      EXPECT_TRUE(ti.have_token());
+      EXPECT_TRUE(ti.have_token_base<Func>());
     for(auto& word : words) {
-      ASSERT_TRUE(ti.next_token());
+      ASSERT_TRUE(ti.next_token_base<Func>());
       ASSERT_EQ(ti.token, word);
     }
-    ASSERT_FALSE(ti.have_token());
-    ASSERT_FALSE(ti.next_token());
-    ASSERT_FALSE(ti.next_token());
+    ASSERT_FALSE(ti.have_token_base<Func>());
+    ASSERT_FALSE(ti.next_token_base<Func>());
+    ASSERT_FALSE(ti.next_token_base<Func>());
+  }
+  void test(string input, vector<string> words) {
+    test<token_iterator::word_char>(input, words);
   }
 };
+
+int isntsemicolon(int i) {
+  return i != ';';
+}
+
 INSTANTIATE_TEST_SUITE_P(token_iterator, token_iterator_test, ValuesIn({0}));
 TEST_P(token_iterator_test, general) {
   EXPECT_NO_FATAL_FAILURE(test("foo; bar;", {"foo;", "bar;"}));
   EXPECT_NO_FATAL_FAILURE(test("   ", {}));
   EXPECT_NO_FATAL_FAILURE(test(" Lorem ipsum dolor sit_amet  ", {"Lorem", "ipsum", "dolor", "sit_amet"}));
+  EXPECT_NO_FATAL_FAILURE(test<isntsemicolon>("  Lorem; ipsum;;dolor;sit_amet  ", {"  Lorem", " ipsum", "dolor", "sit_amet  "}));
   EXPECT_NO_FATAL_FAILURE(test("the quick'brown'fox jumps", {"the", "quick", "brown", "fox", "jumps"}));
   EXPECT_NO_FATAL_FAILURE(test("the 'brown' fox jumps", {"the", "brown", "fox", "jumps"}));
   EXPECT_NO_FATAL_FAILURE(test("the 'brown'fox jumps", {"the", "brown", "fox", "jumps"}));
