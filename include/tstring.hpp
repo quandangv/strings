@@ -24,8 +24,8 @@ public:
   tstring() : tstring(nullptr, 0, 0) {}
   tstring(const tstring& s) : tstring(s.data, s.pos, s.end_pos) {}
   tstring(const string& s, size_t pos) : tstring(s.data(), pos, s.size()) {}
-  explicit tstring(const char* data) : tstring(data, 0, strlen(data)) {}
-  explicit tstring(const string& s) : tstring(s.data(), 0, s.size()) {}
+  tstring(const char* data) : tstring(data, 0, strlen(data)) {}
+  tstring(const string& s) : tstring(s.data(), 0, s.size()) {}
 
   size_t length() const;
   size_t size() const { return length(); }
@@ -49,7 +49,6 @@ public:
   // linear time operations
   void erase(string& source, size_t offset, size_t length = -1);
   bool operator==(const tstring& s) const { return compare(s) == 0; }
-  bool operator==(const string& s) const { return compare(s) == 0; }
   bool operator<(const tstring& s) const { return compare(s) < 0; }
   bool operator>(const tstring& s) const { return compare(s) > 0; }
   bool operator<=(const tstring& s) const { return compare(s) <= 0; }

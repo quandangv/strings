@@ -10,6 +10,9 @@
 template<int (*char_func)(int)>
 tstring get_token(tstring& str);
 
+template<int Char>
+tstring get_token(tstring& str);
+
 struct token_iterator {
   token_iterator(string&& s) : input(move(s)), current(input) {}
   token_iterator() : token_iterator("") {}
@@ -18,28 +21,36 @@ struct token_iterator {
   tstring current;
   tstring token;
 
-  static int 
+  static int
   word_char(int c) { return !std::isspace(c) && c != '"' && c != '\''; }
 
-  token_iterator& 
+  token_iterator&
   set_input(std::string&&, size_t position = 0);
 
   template<int (*F)(int)> bool
   have_token_base();
 
-  bool 
+  bool
   have_token() { return have_token_base<word_char>(); }
 
   template<int (*F)(int)> bool
   next_token_base() { token = get_token<F>(current); return !token.untouched(); }
 
-  bool 
+  bool
   next_token() { return !(token = get_token<word_char>(current)).untouched(); }
 };
 
 //
 // Implementation
 //
+
+template<char Char>
+int match_char(int c) { return c != Char; }
+
+template<int Char>
+tstring get_token(tstring& str) {
+  return get_token<match_char<Char>>(str);
+}
 
 template<int (*char_func)(int)>
 tstring get_token(tstring& str) {
