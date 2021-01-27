@@ -4,9 +4,9 @@
 #include <vector>
 #include <tuple>
 
-using comp_test = pair<string, string>;
+#define NOFAIL EXPECT_NO_FATAL_FAILURE
 
-TEST(TString, other) {
+TEST(tstring, other) {
   string str = "  hello  ";
 
   EXPECT_EQ("  hello  ", tstring(str));
@@ -36,120 +36,75 @@ TEST(TString, other) {
   EXPECT_TRUE(ts.untouched());
 }
 
-vector<comp_test> comp_tests = {
-  {"", ""},
-  {"123456789", "123456789"},
-  {"123456789", "1234567"},
-  {"123456789", "123456789abcdef"},
-  {"123456789", "213456789"},
-  {"423456789", "123456789"},
-};
-class CompTest : public Test, public WithParamInterface<comp_test> {};
-INSTANTIATE_TEST_SUITE_P(TString, CompTest, ValuesIn(comp_tests));
-TEST_P(CompTest, comp_equality) {
-  auto a = tstring(GetParam().second);
-  auto b = tstring(GetParam().first);
-  EXPECT_EQ(GetParam().first < GetParam().second, a < b)
-      << "First: " << GetParam().first << endl
-      << "Second: " << GetParam().second;
-  EXPECT_EQ(GetParam().first == GetParam().second, a == b)
-      << "First: " << GetParam().first << endl
-      << "Second: " << GetParam().second;
-  EXPECT_EQ(GetParam().first > GetParam().second, a > b)
-      << "First: " << GetParam().first << endl
-      << "Second: " << GetParam().second;
+void test_compare(const string& str1, const string& str2) {
+  auto ts1 = tstring(str1);
+  auto ts2 = tstring(str2);
+  ASSERT_EQ(str1 == str2, ts1 == ts2);
+  ASSERT_EQ(str1 < str2, ts1 < ts2);
+  ASSERT_EQ(str1 > str2, ts1 > ts2);
+}
+TEST(tstring, compare) {
+  NOFAIL(test_compare("", ""));
+  NOFAIL(test_compare("123456789", "123456789"));
+  NOFAIL(test_compare("123456789", "1234567"));
+  NOFAIL(test_compare("123456789", "123456789abcdef"));
+  NOFAIL(test_compare("123456789", "213456789"));
+  NOFAIL(test_compare("423456789", "123456789"));
 }
 
-using trim_test = pair<string, string>;
-class TrimTest : public Test, public WithParamInterface<trim_test> {};
-vector<trim_test> trim_tests = {
-  { "   abcdef ", "abcdef" },
-  { "   abc def ", "abc def" },
-  { "abc def ", "abc def" },
-  { "abc   def", "abc   def" },
-  { "abc def\t   ", "abc def" },
-  { "     \t   \t   ", "" },
-  { "abc def_   ", "abc def_" },
-};
-INSTANTIATE_TEST_SUITE_P(TString, TrimTest, ValuesIn(trim_tests));
-TEST_P(TrimTest, trim_equality) {
-  auto expect = tstring(GetParam().second);
-  auto reality = tstring(GetParam().first);
-  EXPECT_EQ(expect, trim(reality));
-  EXPECT_EQ(expect, reality);
+void test_trim(const string& before, const string& after, bool quotes = false) {
+  tstring ts(before), ts2(after);
+  if (quotes)
+    ASSERT_EQ(after, trim_quotes(ts));
+  else
+    ASSERT_EQ(after, trim(ts));
+  ASSERT_EQ(ts, ts2);
+}
+TEST(tstring, trim) {
+  NOFAIL(test_trim("   abcdef ", "abcdef"));
+  NOFAIL(test_trim("   abc def ", "abc def"));
+  NOFAIL(test_trim("abc def ", "abc def"));
+  NOFAIL(test_trim("abc   def", "abc   def"));
+  NOFAIL(test_trim("abc def\t   ", "abc def"));
+  NOFAIL(test_trim("     \t   \t   ", ""));
+  NOFAIL(test_trim("abc def_   ", "abc def_"));
+
+  NOFAIL(test_trim("123456", "123456", true));
+  NOFAIL(test_trim("", "", true));
+  NOFAIL(test_trim("  123456  ", "123456", true));
+  NOFAIL(test_trim("  ' 1 2 3' ", " 1 2 3", true));
+  NOFAIL(test_trim(" ' 12345 6 \"", "' 12345 6 \"", true));
 }
 
-struct cut_test {
-  const char *src, *front, *back, *result, *front_result, *back_result;
-  bool fail, front_fail, back_fail;
-};
-class CutTest : public Test, public WithParamInterface<cut_test> {};
-
-vector<cut_test> cut_tests = {
-  {"${abcdef}",    "${", "}",      "abcdef", "abcdef}", "${abcdef"},
-  {"${abcdef]",    "${", "}",      "${abcdef]", "abcdef]", "${abcdef]", true, false, true},
-  {"**abcdef**",   "**", "**",     "abcdef", "abcdef**", "**abcdef"},
-  {"/*abcdef",     "/*", "*/",     "/*abcdef", "abcdef", "/*abcdef", true, false, true},
-  {"rgb:FF0000",   "rgb:", "",     "FF0000", "FF0000", "rgb:FF0000"},
-  {"hsl:",         "hsl:", "",     "", "", "hsl:"},
-  {".cpp",         "", ".cpp",     "", ".cpp", ""},
-  {"hsl:",         "hsl!", "",     "hsl:", "hsl:", "hsl:", true, true, false},
-  {".cpp",         "", ".cpP",     ".cpp", ".cpp", ".cpp", true, false, true},
-  {"rgb::hsl",     "rgb:", ":hsl", "", ":hsl", "rgb:"},
-  {"",             "", "",         "", "", ""},
-  {"abcdef",       "", "",         "abcdef", "abcdef", "abcdef"},
-  {"' f a i l '",  "'", "'",       " f a i l ", " f a i l '", "' f a i l "},
-  {"\" f ail '", "'", "'",        "\" f ail '", "\" f ail '", "\" f ail ", true, true, false},
-};
-INSTANTIATE_TEST_SUITE_P(TString, CutTest, ValuesIn(cut_tests));
-TEST_P(CutTest, cut_front_back) {
-  auto& testset = GetParam();
-  tstring src(testset.src);
-  EXPECT_EQ(cut_front_back(src, testset.front, testset.back), !testset.fail)
-      << "Source: " << testset.src;
-  EXPECT_EQ(src, string(testset.result))
-      << "Source: " << testset.src;
+void test_cut(const string& source, const string& front, const string& back,
+              const string& result, const string& front_result, const string& back_result,
+              bool fail = false, bool front_fail = false, bool back_fail = false) {
+  tstring ts(source);
+  ASSERT_EQ(cut_front_back(ts, front.data(), back.data()), !fail);
+  ASSERT_EQ(ts, result);
+  ts = tstring(source);
+  ASSERT_EQ(cut_front(ts, front.data()), !front_fail);
+  ASSERT_EQ(ts, front_result);
+  ts = tstring(source);
+  ASSERT_EQ(cut_back(ts, back.data()), !back_fail);
+  ASSERT_EQ(ts, back_result);
 }
-
-TEST_P(CutTest, cut_front) {
-  auto& testset = GetParam();
-  tstring src(testset.src);
-  EXPECT_EQ(cut_front(src, testset.front), !testset.front_fail)
-      << "Source: " << testset.src;
-  EXPECT_EQ(src, string(testset.front_result))
-      << "Source: " << testset.src;
-}
-
-TEST_P(CutTest, cut_back) {
-  auto& testset = GetParam();
-  tstring src(testset.src);
-  EXPECT_EQ(cut_back(src, testset.back), !testset.back_fail)
-      << "Source: " << testset.src;
-  EXPECT_EQ(src, string(testset.back_result))
-      << "Source: " << testset.src;
-}
-
-struct trim_quotes_test {
-  const char *src, *result;
+TEST(tstring, cut) {
+  NOFAIL(test_cut("${abcdef}",    "${", "}",      "abcdef", "abcdef}", "${abcdef"));
+  NOFAIL(test_cut("${abcdef]",    "${", "}",      "${abcdef]", "abcdef]", "${abcdef]", true, false, true));
+  NOFAIL(test_cut("**abcdef**",   "**", "**",     "abcdef", "abcdef**", "**abcdef"));
+  NOFAIL(test_cut("/*abcdef",     "/*", "*/",     "/*abcdef", "abcdef", "/*abcdef", true, false, true));
+  NOFAIL(test_cut("rgb:FF0000",   "rgb:", "",     "FF0000", "FF0000", "rgb:FF0000"));
+  NOFAIL(test_cut("hsl:",         "hsl:", "",     "", "", "hsl:"));
+  NOFAIL(test_cut(".cpp",         "", ".cpp",     "", ".cpp", ""));
+  NOFAIL(test_cut("hsl:",         "hsl!", "",     "hsl:", "hsl:", "hsl:", true, true, false));
+  NOFAIL(test_cut(".cpp",         "", ".cpP",     ".cpp", ".cpp", ".cpp", true, false, true));
+  NOFAIL(test_cut("rgb::hsl",     "rgb:", ":hsl", "", ":hsl", "rgb:"));
+  NOFAIL(test_cut("",             "", "",         "", "", ""));
+  NOFAIL(test_cut("abcdef",       "", "",         "abcdef", "abcdef", "abcdef"));
+  NOFAIL(test_cut("' f a i l '",  "'", "'",       " f a i l ", " f a i l '", "' f a i l "));
+  NOFAIL(test_cut("\" f ail '",   "'", "'",       "\" f ail '", "\" f ail '", "\" f ail ", true, true, false));
 };
-class TrimQuotesTest : public Test, public WithParamInterface<trim_quotes_test> {};
-
-vector<trim_quotes_test> trim_quotes_tests = {
-  {"123456", "123456"},
-  {"", ""},
-  {"  123456  ", "123456"},
-  {"  ' 1 2 3' ", " 1 2 3"},
-  {" ' 12345 6 \"", "' 12345 6 \""},
-};
-INSTANTIATE_TEST_SUITE_P(TString, TrimQuotesTest, ValuesIn(trim_quotes_tests));
-TEST_P(TrimQuotesTest, trim) {
-  auto& testset = GetParam();
-  tstring src(testset.src);
-  trim_quotes(src);
-  EXPECT_EQ(src, testset.result)
-      << "Source: " << testset.src;
-}
-
 constexpr char test_source[] = "123456";
 
 struct substr_test { size_t pos, end_pos, index, length; string result; };
@@ -160,7 +115,7 @@ vector<substr_test> substr_tests = {
   {0, 6, 9, 1, ""},
   {1, 5, 1, 9, "345"},
 };
-INSTANTIATE_TEST_SUITE_P(TString, SubstrTest, ValuesIn(substr_tests));
+INSTANTIATE_TEST_SUITE_P(tstring, SubstrTest, ValuesIn(substr_tests));
 
 TEST_P(SubstrTest, substr) {
   auto testset = GetParam();
@@ -184,7 +139,7 @@ vector<erase_test> erase_tests = {
   {9, ""},
   {-9, ""},
 };
-INSTANTIATE_TEST_SUITE_P(TString, EraseTest, ValuesIn(erase_tests));
+INSTANTIATE_TEST_SUITE_P(tstring, EraseTest, ValuesIn(erase_tests));
 TEST_P(EraseTest, erase_front_back) {
   auto testset = GetParam();
   auto reality = tstring(test_source);
@@ -205,7 +160,7 @@ vector<erase_mid_test> erase_mid_tests = {
   {4, 9, "1234"},
   {1, 2, "1456"},
 };
-INSTANTIATE_TEST_SUITE_P(TString, erase_mid_test_intf, ValuesIn(erase_mid_tests));
+INSTANTIATE_TEST_SUITE_P(tstring, erase_mid_test_intf, ValuesIn(erase_mid_tests));
 TEST_P(erase_mid_test_intf, erase_mid) {
   auto src = string(test_source);
   auto testset = GetParam();
@@ -232,7 +187,7 @@ vector<find_enclosed_test> find_enclosed_tests = {
   {"$$2345;$$$A;;", "$$", "{", ";", 2, 5, 10},
   {"$$2345;$A;;", "$$", "$", ";", 2, 5, 10, true},
 };
-INSTANTIATE_TEST_SUITE_P(TString, find_enclosed_test_intf, ValuesIn(find_enclosed_tests));
+INSTANTIATE_TEST_SUITE_P(tstring, find_enclosed_test_intf, ValuesIn(find_enclosed_tests));
 TEST_P(find_enclosed_test_intf, find) {
   auto testset = GetParam();
   tstring src(testset.source.data(), testset.offset, testset.source.size());
@@ -256,7 +211,7 @@ vector<find_test> find_tests = {
   {"123404321", '5', -1, -1},
   {"123454321", 0, -1, -1},
 };
-INSTANTIATE_TEST_SUITE_P(TString, find_test_intf, ValuesIn(find_tests));
+INSTANTIATE_TEST_SUITE_P(tstring, find_test_intf, ValuesIn(find_tests));
 TEST_P(find_test_intf, find) {
   auto testset = GetParam();
   tstring src(testset.source);

@@ -59,10 +59,10 @@ public:
 template<typename T>
 std::strong_ordering tstring::compare(const T& other) const {
   auto len = length();
-  if (auto diff = other.length() <=> len; diff != 0)
+  if (auto diff = len <=> other.length(); diff != 0)
     return diff;
   for(size_t i = 0; i < len; i++)
-    if (auto diff = other[i] <=> (*this)[i]; diff != 0)
+    if (auto diff = (*this)[i] <=> other[i]; diff != 0)
       return diff;
   return std::strong_ordering::equal;
 }
