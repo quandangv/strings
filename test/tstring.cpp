@@ -179,6 +179,8 @@ class find_enclosed_test_intf : public Test, public WithParamInterface<find_encl
 
 vector<find_enclosed_test> find_enclosed_tests = {
   {"${2345}${9}", "${", "${", "}", 0, 0, 7},
+  {"${abcd%{e}}", "${", "{", "}", 0, 0, 11},
+  {"%{abcd${e}}", "${", "{", "}", 0, 6, 10},
   {"${2%{hello}345}${9}", "${", "{", "}", 0, 0, 15},
   {"${2345}${9} ", "${", "{", "}", 7, 0, 4},
   {"${2345}${9}", "${", "${", "}", 2, 5, 9},

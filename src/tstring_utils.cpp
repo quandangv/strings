@@ -46,7 +46,8 @@ bool find_enclosed(tstring& str, string& src,
 
     } else if (ptr < false_start_limit && compare(false_start_group)) {
       // Detected false start group
-      opening_count++;
+      if (opening_count)
+        opening_count++;
       ptr += false_start_group.size() - 1;
 
     } else if (compare(end_group)) {
