@@ -8,26 +8,27 @@
 template<typename T, typename U>
 concept iterable = requires (T a) {
   { *a.begin() } -> std::convertible_to<U>;
-  { *a.begin()++ } -> std::convertible_to<U>;
+  { *++a.begin() } -> std::convertible_to<U>;
   { *a.end() }   -> std::convertible_to<U>;
 };
 
-template<typename T>
+template<typename StringIter, typename SizeIter>
 std::string interpolate(
     const std::string& base,
-    const std::vector<size_t> positions,
-    const T& replacements
-) requires iterable<T, std::string> {
+    const SizeIter positions,
+    const StringIter& replacements
+) requires iterable<StringIter, std::string> && iterable<SizeIter, size_t> {
   std::stringstream ss;
   auto repit = replacements.begin();
   int lastpoint = 0;
-  for (int point : positions) {
+  for (size_t point : positions) {
     // Check for invalid points 
     if (point > base.size() || point < lastpoint)
       continue;
     if (repit == replacements.end())
       break;
-    ss << base.substr(lastpoint, point - lastpoint) << *repit++;
+    ss << base.substr(lastpoint, point - lastpoint) << *repit;
+    ++repit;
     lastpoint = point;
   }
   ss << base.substr(lastpoint);
