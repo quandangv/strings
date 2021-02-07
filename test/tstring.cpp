@@ -9,7 +9,7 @@
 TEST(tstring, other) {
   string str = "  hello  ";
 
-  EXPECT_EQ("  hello  ", tstring(str));
+  EXPECT_EQ("  hello  "_ts, tstring(str));
 
   str = "123456789";
   EXPECT_EQ(string("123456789").length(), tstring(move(str)).length());
@@ -23,7 +23,7 @@ TEST(tstring, other) {
 
   tstring ts{"hello"};
   ts.set("goodbye");
-  EXPECT_EQ("goodbye", ts);
+  EXPECT_EQ("goodbye"_ts, ts);
   EXPECT_EQ('g', ts.front());
   EXPECT_EQ('e', ts.back());
 
@@ -80,13 +80,13 @@ void test_cut(const string& source, const string& front, const string& back,
               const string& result, const string& front_result, const string& back_result,
               bool fail = false, bool front_fail = false, bool back_fail = false) {
   tstring ts(source);
-  ASSERT_EQ(cut_front_back(ts, front.data(), back.data()), !fail);
+  ASSERT_EQ(cut_front_back(ts, tstring(front), tstring(back)), !fail);
   ASSERT_EQ(ts, result);
   ts = tstring(source);
-  ASSERT_EQ(cut_front(ts, front.data()), !front_fail);
+  ASSERT_EQ(cut_front(ts, tstring(front)), !front_fail);
   ASSERT_EQ(ts, front_result);
   ts = tstring(source);
-  ASSERT_EQ(cut_back(ts, back.data()), !back_fail);
+  ASSERT_EQ(cut_back(ts, tstring(back)), !back_fail);
   ASSERT_EQ(ts, back_result);
 }
 TEST(tstring, cut) {

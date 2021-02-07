@@ -24,7 +24,6 @@ public:
   tstring() : tstring(nullptr, 0, 0) {}
   tstring(const tstring& s) : tstring(s.data, s.pos, s.end_pos) {}
   tstring(const string& s, size_t pos) : tstring(s.data(), pos, s.size()) {}
-  tstring(const char* data) : tstring(data, 0, strlen(data)) {}
   tstring(const string& s) : tstring(s.data(), 0, s.size()) {}
 
   size_t length() const;
@@ -67,14 +66,16 @@ std::strong_ordering tstring::compare(const T& other) const {
   return std::strong_ordering::equal;
 }
 
+tstring operator ""_ts(const char* str, size_t len);
+
 size_t ltrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
 size_t rtrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
 tstring& trim(tstring& ts, const char* trim_char = "\r\n\t\v\f ");
 tstring& trim_quotes(tstring&);
 
-bool cut_front(tstring&, const char* front);
-bool cut_back(tstring&, const char* back);
-bool cut_front_back(tstring&, const char* front, const char* back = "");
+bool cut_front(tstring&, tstring front);
+bool cut_back(tstring&, tstring back);
+bool cut_front_back(tstring&, tstring front, tstring back);
 tstring cut_front(tstring&, char limit);
 tstring cut_back(tstring&, char limit);
 

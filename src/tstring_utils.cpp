@@ -1,5 +1,9 @@
 #include "tstring.hpp"
 
+tstring operator ""_ts(const char* str, size_t len) {
+  return tstring(str, 0, len);
+}
+
 size_t find(const tstring& ts, char ch) {
   auto result = std::find(ts.begin(), ts.end(), ch);
   return result == ts.end() ? tstring::npos : result - ts.begin();
@@ -86,14 +90,14 @@ tstring& trim(tstring& ts, const char* trim_char) {
 
 tstring& trim_quotes(tstring& ts) {
   trim(ts);
-  cut_front_back(ts, "'", "'");
-  cut_front_back(ts, "\"", "\"");
+  cut_front_back(ts, "'"_ts, "'"_ts);
+  cut_front_back(ts, "\""_ts, "\""_ts);
   return ts;
 }
 
-bool cut_front(tstring& ts, const char* front) {
-  auto lfront = strlen(front);
-  if (lfront > ts.length() || !std::equal(front, front + lfront, ts.begin()))
+bool cut_front(tstring& ts, tstring front) {
+  auto lfront = front.size();
+  if (lfront > ts.length() || !std::equal(front.begin(), front.begin() + lfront, ts.begin()))
     return false;
   ts.erase_front(lfront);
   return true;
@@ -109,9 +113,9 @@ tstring cut_front(tstring& ts, char limit) {
   }
 }
 
-bool cut_back(tstring& ts, const char* back) {
-  auto lback = strlen(back);
-  if (lback > ts.length() || !std::equal(back, back + lback, ts.end() - lback))
+bool cut_back(tstring& ts, tstring back) {
+  auto lback = back.size();
+  if (lback > ts.length() || !std::equal(back.begin(), back.begin() + lback, ts.end() - lback))
     return false;
   ts.erase_back(lback);
   return true;
@@ -127,10 +131,10 @@ tstring cut_back(tstring& ts, char limit) {
   }
 }
 
-bool cut_front_back(tstring& ts, const char* front, const char* back) {
-  auto lfront = strlen(front);
-  auto lback = strlen(back);
-  if (lfront + lback > ts.length() || !std::equal(front, front + lfront, ts.begin()) || !std::equal(back, back + lback, ts.end() - lback))
+bool cut_front_back(tstring& ts, tstring front, tstring back) {
+  auto lfront = front.size();
+  auto lback = back.size();
+  if (lfront + lback > ts.length() || !std::equal(front.begin(), front.begin() + lfront, ts.begin()) || !std::equal(back.begin(), back.begin() + lback, ts.end() - lback))
     return false;
   ts.erase_front(lfront);
   ts.erase_back(lback);
