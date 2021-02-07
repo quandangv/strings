@@ -1,3 +1,4 @@
+#!/bin/bash
 git submodule update --init --rebase -- cmake
 source cmake/utils.sh
 
