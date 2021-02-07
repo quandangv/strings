@@ -62,22 +62,26 @@ bool find_enclosed(tstring& str, string& src,
   return false;
 }
 
-tstring& ltrim(tstring& ts, const char* trim_char) {
+size_t ltrim(tstring& ts, const char* trim_char) {
   auto ptr = ts.begin(), end = ts.end();
   for(; ptr != end && strchr(trim_char, *ptr) != nullptr; ptr++);
-  ts.erase_front(ptr - ts.begin());
-  return ts;
+  auto count = ptr - ts.begin();
+  ts.erase_front(count);
+  return count;
 }
 
-tstring& rtrim(tstring& ts, const char* trim_char) {
+size_t rtrim(tstring& ts, const char* trim_char) {
   auto ptr = ts.rbegin(), end = ts.rend();
   for(; ptr != end && strchr(trim_char, *ptr) != nullptr; ptr++);
-  ts.erase_back(ptr - ts.rbegin());
-  return ts;
+  auto count = ptr - ts.rbegin();
+  ts.erase_back(count);
+  return count;
 }
 
 tstring& trim(tstring& ts, const char* trim_char) {
-  return ltrim(ts, trim_char), rtrim(ts, trim_char);
+  ltrim(ts, trim_char);
+  rtrim(ts, trim_char);
+  return ts;
 }
 
 tstring& trim_quotes(tstring& ts) {

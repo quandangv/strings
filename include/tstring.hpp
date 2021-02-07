@@ -67,8 +67,8 @@ std::strong_ordering tstring::compare(const T& other) const {
   return std::strong_ordering::equal;
 }
 
-tstring& ltrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
-tstring& rtrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
+size_t ltrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
+size_t rtrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
 tstring& trim(tstring& ts, const char* trim_char = "\r\n\t\v\f ");
 tstring& trim_quotes(tstring&);
 
