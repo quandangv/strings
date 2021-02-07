@@ -19,6 +19,7 @@ set(INCLUDE_DIRS ${PUBLIC_HEADERS_DIR} ${PRIVATE_HEADERS_DIR} ${GENERATED_HEADER
 set(PUBLIC_HEADERS
   ${PUBLIC_HEADERS_DIR}/tstring.hpp
   ${PUBLIC_HEADERS_DIR}/token_iterator.hpp
+  ${PUBLIC_HEADERS_DIR}/string_interpolate.hpp
 )
 
 # source files
