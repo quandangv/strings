@@ -3,21 +3,23 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <concepts>
+//#include <concepts>
 
-template<typename T, typename U>
-concept iterable = requires (T a) {
-  { *a.begin() } -> std::convertible_to<U>;
-  { *++a.begin() } -> std::convertible_to<U>;
-  { *a.end() }   -> std::convertible_to<U>;
-};
+//template<typename T, typename U>
+//concept iterable = requires (T a) {
+//  { *a.begin() } -> std::convertible_to<U>;
+//  { *++a.begin() } -> std::convertible_to<U>;
+//  { *a.end() }   -> std::convertible_to<U>;
+//};
 
 template<typename StringIter, typename SizeIter>
 std::string interpolate(
     const std::string& base,
     const SizeIter positions,
     const StringIter& replacements
-) requires iterable<StringIter, std::string> && iterable<SizeIter, size_t> {
+)
+//    requires iterable<StringIter, std::string> && iterable<SizeIter, size_t>
+{
   std::stringstream ss;
   auto repit = replacements.begin();
   int lastpoint = 0;
