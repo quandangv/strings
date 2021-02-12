@@ -66,6 +66,15 @@ std::strong_ordering tstring::compare(const T& other) const {
   return std::strong_ordering::equal;
 }
 
+template<typename T, T (*converter)(const char*, char**)>
+T convert(const tstring& ts) {
+	char* pos;
+  auto result = converter(ts.begin(), &pos);
+  if (pos != ts.end())
+    throw std::invalid_argument("Invalid numerical value");
+  return result;
+}
+
 tstring operator ""_ts(const char* str, size_t len);
 
 size_t ltrim(tstring&, const char* trim_char = "\r\n\t\v\f ");
