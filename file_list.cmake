@@ -27,10 +27,7 @@ set(TSTRING_SOURCES
   ${SRC_DIR}/tstring.cpp
   ${SRC_DIR}/tstring_utils.cpp
 )
-set(TOKEN_ITERATOR_SOURCES
-  ${SRC_DIR}/token_iterator.cpp
-)
-set(SOURCES ${TSTRING_SOURCES} ${TOKEN_ITERATOR_SOURCES})
+set(SOURCES ${TSTRING_SOURCES})
 
 # tests
 set(EXTERNAL_TESTS tstring string_interpolate token_iterator)

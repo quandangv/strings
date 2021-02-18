@@ -13,35 +13,11 @@ tstring get_token(tstring& str);
 template<int Char>
 tstring get_token(tstring& str);
 
-struct token_iterator {
-  token_iterator(string&& s) : input(move(s)), current(input) {}
-  token_iterator() : token_iterator("") {}
-
-  std::string input;
-  tstring current;
-  tstring token;
-
-  static int
-  word_char(int c) { return !std::isspace(c) && c != '"' && c != '\''; }
-
-  token_iterator&
-  set_input(std::string&&, size_t position = 0);
-
-  template<int (*F)(int)> bool
-  have_token_base();
-
-  bool
-  have_token() { return have_token_base<word_char>(); }
-
-  template<int (*F)(int)> bool
-  next_token_base() { token = get_token<F>(current); return !token.untouched(); }
-
-  bool
-  next_token() { return !(token = get_token<word_char>(current)).untouched(); }
-};
+inline int
+default_token_chars(int c) { return !std::isspace(c) && c != '"' && c != '\''; }
 
 inline tstring get_word(tstring& str)
-{ return get_token<token_iterator::word_char>(str); }
+{ return get_token<default_token_chars>(str); }
 
 template<size_t count>
 int fill_tokens(tstring& str, std::array<tstring, count>& output);
@@ -68,12 +44,18 @@ tstring get_token(tstring& str) {
   for(; ptr < end; ptr++) {
     std::function<void(char)> match_bracket = [&](char search) {
       for(; ++ptr < end;) {
+        // If the matching bracket is encountered, return normally.
         if (*ptr == search) {
           ptr++;
           return;
         }
-        if (auto type = strchr(open_brackets, *ptr); type)
+        // If an opening bracket is encountered, start a recursive call to match it.
+        if (auto type = strchr(open_brackets, *ptr); type) {
           match_bracket(close_brackets[type - open_brackets]);
+          ptr--;
+          continue;
+        }
+        // If an unmatched closing bracket is encountered, return without consuming it.
         if (auto type = strchr(close_brackets, *ptr); type)
           return;
       }
@@ -102,14 +84,6 @@ tstring get_token(tstring& str) {
     }
   }
   return tstring();
-}
-
-template<int (*F)(int)>
-bool token_iterator::have_token_base() {
-  for(; !current.empty(); current.erase_front())
-    if (F(current.front()))
-      return true;
-  return false;
 }
 
 template<size_t count>

@@ -2,8 +2,8 @@
 #include "test.h"
 
 TEST(word_char, basic) {
-  EXPECT_FALSE(token_iterator::word_char('"'));
-  EXPECT_FALSE(token_iterator::word_char('"'));
+  EXPECT_FALSE(default_token_chars('"'));
+  EXPECT_FALSE(default_token_chars('"'));
 }
 
 struct get_token_test : public TestWithParam<int> {
@@ -15,10 +15,10 @@ struct get_token_test : public TestWithParam<int> {
 };
 INSTANTIATE_TEST_SUITE_P(token_iterator, get_token_test, ValuesIn({0}));
 TEST_P(get_token_test, general) {
-  EXPECT_NO_FATAL_FAILURE(test<token_iterator::word_char>("hello world", 0, "hello"));
-  EXPECT_NO_FATAL_FAILURE(test<token_iterator::word_char>("hello world", 1, "ello"));
-  EXPECT_NO_FATAL_FAILURE(test<token_iterator::word_char>("hello  world", 5, "world"));
-  EXPECT_NO_FATAL_FAILURE(test<token_iterator::word_char>("hello  world", 100, ""));
+  EXPECT_NO_FATAL_FAILURE(test<default_token_chars>("hello world", 0, "hello"));
+  EXPECT_NO_FATAL_FAILURE(test<default_token_chars>("hello world", 1, "ello"));
+  EXPECT_NO_FATAL_FAILURE(test<default_token_chars>("hello  world", 5, "world"));
+  EXPECT_NO_FATAL_FAILURE(test<default_token_chars>("hello  world", 100, ""));
 
   EXPECT_NO_FATAL_FAILURE(test<isalnum>("foo;bar", 0, "foo"));
   EXPECT_NO_FATAL_FAILURE(test<isalnum>("foo__bar", 1, "oo"));
@@ -28,19 +28,14 @@ TEST_P(get_token_test, general) {
 struct token_iterator_test : public TestWithParam<int> {
   template<int(*Func)(int)>
   void test(string input, vector<string> words) {
-    token_iterator ti{move(input)};
-    if (!words.empty())
-      EXPECT_TRUE(ti.have_token_base<Func>());
+    tstring ts(input);
     for(auto& word : words) {
-      ASSERT_TRUE(ti.next_token_base<Func>());
-      ASSERT_EQ(ti.token, word);
+      ASSERT_EQ(get_token<Func>(ts), word);
     }
-    ASSERT_FALSE(ti.have_token_base<Func>());
-    ASSERT_FALSE(ti.next_token_base<Func>());
-    ASSERT_FALSE(ti.next_token_base<Func>());
+    ASSERT_TRUE(get_token<Func>(ts).untouched());
   }
   void test(string input, vector<string> words) {
-    test<token_iterator::word_char>(input, words);
+    test<default_token_chars>(input, words);
   }
 };
 
@@ -60,6 +55,8 @@ TEST_P(token_iterator_test, general) {
   EXPECT_NO_FATAL_FAILURE(test("the (brown) fox jumps", {"the", "(brown)", "fox", "jumps"}));
   EXPECT_NO_FATAL_FAILURE(test("the (brown fox) jumps", {"the", "(brown fox)", "jumps"}));
   EXPECT_NO_FATAL_FAILURE(test("the (brown (fox)) jumps", {"the", "(brown (fox))", "jumps"}));
-  EXPECT_NO_FATAL_FAILURE(test("the (brown [fox) jumps", {"the", "(brown [fox)", 
-  "jumps"}));
+  EXPECT_NO_FATAL_FAILURE(test("the (brown [fox) jumps", {"the", "(brown [fox)", "jumps"}));
+  EXPECT_NO_FATAL_FAILURE(test("abc(1, 2, 123)", {"abc(1, 2, 123)"}));
+  EXPECT_NO_FATAL_FAILURE(test("[abc(1, 2, 123)]", {"[abc(1, 2, 123)]"}));
+  EXPECT_NO_FATAL_FAILURE(test("'abc(1, 2, 123)'", {"abc(1, 2, 123)"}));
 }
