@@ -1,2 +1,3 @@
 build/
 contrib/
+.codecov-token
