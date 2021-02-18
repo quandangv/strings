@@ -26,25 +26,29 @@ public:
   tstring(const string& s, size_t pos) : tstring(s.data(), pos, s.size()) {}
   tstring(const string& s) : tstring(s.data(), 0, s.size()) {}
 
-  size_t length() const;
+  size_t length() const { return end_pos - pos; }
   size_t size() const { return length(); }
-  bool empty() const;
-  bool untouched() const;
-  char front() const;
-  char back() const;
-  const char* begin() const;
-  const char* end() const;
-  std::reverse_iterator<const char*> rbegin() const;
-  std::reverse_iterator<const char*> rend() const;
-  char operator[](size_t) const;
+  bool empty() const { return length() == 0; }
+  bool untouched() const { return data == nullptr; }
+  char front() const { return data[pos]; }
+  char back() const { return data[end_pos - 1]; }
+  const char* begin() const { return data + pos; }
+  const char* end() const { return data + end_pos; }
+  char operator[](size_t index) const { return data[pos + index]; }
   tstring interval(size_t start, size_t end) const;
   tstring interval(size_t start) const { return interval(start, end_pos); }
-  void merge(tstring& other);
+  void merge(const tstring& other);
+
+  std::reverse_iterator<const char*> rbegin() const
+  { return std::reverse_iterator<const char*>(data + end_pos); }
+
+  std::reverse_iterator<const char*> rend() const
+  { return std::reverse_iterator<const char*>(data + pos); }
 
   void set(const string&);
-  void erase_front(size_t = 1);
-  void erase_back(size_t = 1);
-  void set_length(size_t);
+  void erase_front(size_t count = 1) { pos += std::min(length(), count); }
+  void erase_back(size_t count = 1) { end_pos -= std::min(length(), count); }
+  void set_length(size_t length) { end_pos = pos + std::min(size(), length); }
 
   // linear time operations
   void erase(string& source, size_t offset, size_t length = -1);

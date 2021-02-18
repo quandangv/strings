@@ -25,13 +25,15 @@ std::string interpolate(
   int lastpoint = 0;
   for (size_t point : positions) {
     // Check for invalid points 
-    if (point > base.size() || point < lastpoint)
+    if (point > base.size() || point < lastpoint) {
+      ++repit;
       continue;
+    }
     if (repit == replacements.end())
       break;
     ss << base.substr(lastpoint, point - lastpoint) << *repit;
-    ++repit;
     lastpoint = point;
+    ++repit;
   }
   ss << base.substr(lastpoint);
   return ss.str();

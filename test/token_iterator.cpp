@@ -26,16 +26,22 @@ TEST_P(get_token_test, general) {
 }
 
 struct token_iterator_test : public TestWithParam<int> {
-  template<int(*Func)(int)>
-  void test(string input, vector<string> words) {
+  template<int(*func)(int)>
+  void test(string input, vector<string> words, string re_merged = "") {
     tstring ts(input);
-    for(auto& word : words) {
-      ASSERT_EQ(get_token<Func>(ts), word);
+    array<tstring, 10> arr;
+    auto count = fill_tokens<func, 10>(ts, arr);
+    ASSERT_EQ(count, words.size());
+    for(int i = 0; i < count; i++) {
+      ASSERT_EQ(arr[i], words[i]);
     }
-    ASSERT_TRUE(get_token<Func>(ts).untouched());
+    if (count) {
+      arr[0].merge(arr[count - 1]);
+      ASSERT_EQ(arr[0], re_merged.empty() ? input : re_merged);
+    }
   }
-  void test(string input, vector<string> words) {
-    test<default_token_chars>(input, words);
+  void test(string input, vector<string> words, string re_merged = "") {
+    test<default_token_chars>(input, words, re_merged);
   }
 };
 
@@ -47,7 +53,7 @@ INSTANTIATE_TEST_SUITE_P(token_iterator, token_iterator_test, ValuesIn({0}));
 TEST_P(token_iterator_test, general) {
   EXPECT_NO_FATAL_FAILURE(test("foo; bar;", {"foo;", "bar;"}));
   EXPECT_NO_FATAL_FAILURE(test("   ", {}));
-  EXPECT_NO_FATAL_FAILURE(test(" Lorem ipsum dolor sit_amet  ", {"Lorem", "ipsum", "dolor", "sit_amet"}));
+  EXPECT_NO_FATAL_FAILURE(test(" Lorem ipsum dolor sit_amet  ", {"Lorem", "ipsum", "dolor", "sit_amet"}, "Lorem ipsum dolor sit_amet"));
   EXPECT_NO_FATAL_FAILURE(test<isntsemicolon>("  Lorem; ipsum;;dolor;sit_amet  ", {"  Lorem", " ipsum", "dolor", "sit_amet  "}));
   EXPECT_NO_FATAL_FAILURE(test("the quick'brown'fox jumps", {"the", "quick", "brown", "fox", "jumps"}));
   EXPECT_NO_FATAL_FAILURE(test("the 'brown' fox jumps", {"the", "brown", "fox", "jumps"}));
@@ -58,5 +64,6 @@ TEST_P(token_iterator_test, general) {
   EXPECT_NO_FATAL_FAILURE(test("the (brown [fox) jumps", {"the", "(brown [fox)", "jumps"}));
   EXPECT_NO_FATAL_FAILURE(test("abc(1, 2, 123)", {"abc(1, 2, 123)"}));
   EXPECT_NO_FATAL_FAILURE(test("[abc(1, 2, 123)]", {"[abc(1, 2, 123)]"}));
-  EXPECT_NO_FATAL_FAILURE(test("'abc(1, 2, 123)'", {"abc(1, 2, 123)"}));
+  EXPECT_NO_FATAL_FAILURE(test("'abc(1, 2, 123)'", {"abc(1, 2, 123)"}, "abc(1, 2, 123)"));
+  EXPECT_ANY_THROW("hello"_ts.merge("world"_ts));
 }

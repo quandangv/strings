@@ -14,58 +14,6 @@ void tstring::set(const string& s) {
   end_pos = s.length();
 }
 
-void tstring::erase_front(size_t count) {
-  pos += min(length(), count);
-}
-
-void tstring::erase_back(size_t count) {
-  end_pos -= min(length(), count);
-}
-
-void tstring::set_length(size_t length) {
-  end_pos = pos + min(size(), length);
-}
-
-bool tstring::empty() const {
-  return length() == 0;
-}
-
-bool tstring::untouched() const {
-  return data == nullptr;
-}
-
-char tstring::front() const {
-  return data[pos];
-}
-
-char tstring::back() const {
-  return data[end_pos - 1];
-}
-
-const char* tstring::begin() const {
-  return data + pos;
-}
-
-const char* tstring::end() const {
-  return data + end_pos;
-}
-
-reverse_iterator<const char*> tstring::rbegin() const {
-  return reverse_iterator<const char*>(data + end_pos);
-}
-
-reverse_iterator<const char*> tstring::rend() const {
-  return reverse_iterator<const char*>(data + pos);
-}
-
-size_t tstring::length() const {
-  return end_pos - pos;
-}
-
-char tstring::operator[](size_t index) const {
-  return data[pos + index];
-}
-
 tstring tstring::interval(size_t start, size_t end) const {
   if (start >= end_pos)
     return tstring(data, end_pos, end_pos);
@@ -88,7 +36,7 @@ void tstring::erase(string& source, size_t off, size_t length) {
   }
 }
 
-void tstring::merge(tstring& other) {
+void tstring::merge(const tstring& other) {
   if (data != other.data)
     throw std::invalid_argument("tstring::merge: The other tstring must point to the same base string");
   pos = std::min(pos, other.pos);

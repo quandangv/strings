@@ -194,13 +194,18 @@ TEST_P(find_enclosed_test_intf, find) {
   auto testset = GetParam();
   tstring src(testset.source.data(), testset.offset, testset.source.size());
   size_t start, end;
-  ASSERT_EQ(find_enclosed(src, testset.source, testset.start_group, testset.false_start, testset.end_group, start, end), !testset.fail)
-      << "Source: " << src<< ", start: " << testset.offset;
+  ASSERT_EQ(find_enclosed(src, testset.source, testset.start_group, testset.false_start, testset.end_group, start, end), !testset.fail);
   if (!testset.fail) {
-    ASSERT_EQ(start, testset.result_start)
-        << "Source: " << src<< ", start: " << testset.offset;
-    ASSERT_EQ(end, testset.result_end)
-        << "Source: " << src<< ", start: " << testset.offset;
+    ASSERT_EQ(start, testset.result_start);
+    ASSERT_EQ(end, testset.result_end);
+  }
+  if (testset.start_group != testset.false_start)
+    return;
+  src = tstring(testset.source.data(), testset.offset, testset.source.size());
+  ASSERT_EQ(find_enclosed(src, testset.source, testset.start_group, testset.end_group, start, end), !testset.fail);
+  if (!testset.fail) {
+    ASSERT_EQ(start, testset.result_start);
+    ASSERT_EQ(end, testset.result_end);
   }
 }
 
@@ -249,4 +254,7 @@ TEST_P(limit_cut_test, back_limit_cut) {
   test<cut_back>("ff0000:", ':', "", "ff0000");
   test<cut_back>("ff0000", ':', "", "ff0000", true);
   test<cut_back>("ff0000::hsv", ':', "hsv", "ff0000:");
+}
+
+TEST(tstring, little_tests) {
 }
