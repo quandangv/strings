@@ -40,6 +40,12 @@ struct token_iterator {
   next_token() { return !(token = get_token<word_char>(current)).untouched(); }
 };
 
+inline tstring get_word(tstring& str)
+{ return get_token<token_iterator::word_char>(str); }
+
+template<size_t count>
+int fill_tokens(tstring& str, std::array<tstring, count>& output);
+
 //
 // Implementation
 //
@@ -106,3 +112,11 @@ bool token_iterator::have_token_base() {
   return false;
 }
 
+template<size_t count>
+int fill_tokens(tstring& str, std::array<tstring, count>& output) {
+  for (int i = 0; i < count; i++) {
+    if ((output[i] = get_word(str)).untouched())
+      return i;
+  }
+  return count;
+}

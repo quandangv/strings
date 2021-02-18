@@ -39,6 +39,7 @@ public:
   char operator[](size_t) const;
   tstring interval(size_t start, size_t end) const;
   tstring interval(size_t start) const { return interval(start, end_pos); }
+  void merge(tstring& other);
 
   void set(const string&);
   void erase_front(size_t = 1);

@@ -87,3 +87,10 @@ void tstring::erase(string& source, size_t off, size_t length) {
     }
   }
 }
+
+void tstring::merge(tstring& other) {
+  if (data != other.data)
+    throw std::invalid_argument("tstring::merge: The other tstring must point to the same base string");
+  pos = std::min(pos, other.pos);
+  end_pos = std::max(end_pos, other.end_pos);
+}
