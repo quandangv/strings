@@ -104,6 +104,7 @@ bool find_enclosed(tstring&, string& source,
                    size_t& start, size_t& end);
 
 size_t find(const tstring&, char);
+size_t find(const tstring&, const char*);
 size_t rfind(const tstring&, char);
 
 inline tstring substr(const tstring& ts, size_t offset, size_t length)

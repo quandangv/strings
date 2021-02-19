@@ -9,6 +9,13 @@ size_t find(const tstring& ts, char ch) {
   return result == ts.end() ? tstring::npos : result - ts.begin();
 }
 
+size_t find(const tstring& ts, const char* str) {
+  for (auto it = ts.begin(); it != ts.end(); ++it)
+    if (strchr(str, *it))
+      return it - ts.begin();
+  return tstring::npos;
+}
+
 size_t rfind(const tstring& ts, char ch) {
   auto result = std::find(ts.rbegin(), ts.rend(), ch);
   return result == ts.rend() ? tstring::npos : result.base() - ts.begin() - 1;
