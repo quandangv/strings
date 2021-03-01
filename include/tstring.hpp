@@ -3,7 +3,6 @@
 #include <string>
 #include <cstring>
 #include <ostream>
-#include <compare>
 #include <iterator>
 
 using std::string;
@@ -12,7 +11,7 @@ using std::string;
 class tstring {
   // This class doesn't copy string data on construction.
   // Thus it will be invalidated as soon as the original string go out of scope
-  template<typename T> std::strong_ordering compare(const T&) const;
+  template<typename T> int compare(const T&) const;
 protected:
   const char* data;
   size_t pos, end_pos;
@@ -61,14 +60,14 @@ public:
 };
 
 template<typename T>
-std::strong_ordering tstring::compare(const T& other) const {
+int tstring::compare(const T& other) const {
   auto len = length();
-  if (auto diff = len <=> other.length(); diff != 0)
+  if (auto diff = len - other.length(); diff != 0)
     return diff;
   for(size_t i = 0; i < len; i++)
-    if (auto diff = (*this)[i] <=> other[i]; diff != 0)
+    if (auto diff = (*this)[i] - other[i]; diff != 0)
       return diff;
-  return std::strong_ordering::equal;
+  return 0;
 }
 
 template<typename T, T (*converter)(const char*, char**)>
