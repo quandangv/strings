@@ -53,13 +53,13 @@ tstring get_token(tstring& str) {
           return;
         }
         // If an opening bracket is encountered, start a recursive call to match it.
-        if (auto type = strchr(open_brackets, *ptr); type) {
+        if (auto type = strchr(open_brackets, *ptr)) {
           match_bracket(close_brackets[type - open_brackets]);
           ptr--;
           continue;
         }
         // If an unmatched closing bracket is encountered, return without consuming it.
-        if (auto type = strchr(close_brackets, *ptr); type)
+        if (strchr(close_brackets, *ptr))
           return;
       }
     };
@@ -68,7 +68,7 @@ tstring get_token(tstring& str) {
       for(; ptr < end; ptr++) {
         if (!char_func(*ptr))
           break;
-        if (auto type = strchr(open_brackets, *ptr); type) {
+        if (auto type = strchr(open_brackets, *ptr)) {
           match_bracket(close_brackets[type - open_brackets]);
           ptr--;
         }
@@ -77,7 +77,7 @@ tstring get_token(tstring& str) {
       auto result = str.interval(start, end);
       str.erase_front(end);
       return result;
-    } else if (auto type = strchr(open_brackets, *ptr); type) {
+    } else if (auto type = strchr(open_brackets, *ptr)) {
       auto start = ptr - str.begin();
       match_bracket(close_brackets[type - open_brackets]);
       auto end = ptr - str.begin();

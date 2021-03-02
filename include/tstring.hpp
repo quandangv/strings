@@ -62,10 +62,10 @@ public:
 template<typename T>
 int tstring::compare(const T& other) const {
   auto len = length();
-  if (auto diff = len - other.length(); diff != 0)
+  if (auto diff = len - other.length())
     return diff;
   for(size_t i = 0; i < len; i++)
-    if (auto diff = (*this)[i] - other[i]; diff != 0)
+    if (auto diff = (*this)[i] - other[i])
       return diff;
   return 0;
 }
