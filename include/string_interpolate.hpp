@@ -22,7 +22,7 @@ std::string interpolate(
 {
   std::stringstream ss;
   auto repit = replacements.begin();
-  int lastpoint = 0;
+  size_t lastpoint = 0;
   for (size_t point : positions) {
     // Check for invalid points 
     if (point > base.size() || point < lastpoint) {

@@ -91,7 +91,7 @@ tstring get_token(tstring& str) {
 
 template<int(*char_func)(int), size_t count>
 int fill_tokens(tstring& str, std::array<tstring, count>& output) {
-  for (int i = 0; i < count; i++) {
+  for (size_t i = 0; i < count; i++) {
     if ((output[i] = get_token<char_func>(str)).untouched())
       return i;
   }

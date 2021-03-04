@@ -21,7 +21,6 @@ public:
   // const time operations
   tstring(const char* data, size_t pos, size_t end_pos) : data(data), pos(pos), end_pos(end_pos) {}
   tstring() : tstring(nullptr, 0, 0) {}
-  tstring(const tstring& s) : tstring(s.data, s.pos, s.end_pos) {}
   tstring(const string& s, size_t pos) : tstring(s.data(), pos, s.size()) {}
   tstring(const string& s) : tstring(s.data(), 0, s.size()) {}
 
