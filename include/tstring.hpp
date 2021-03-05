@@ -22,6 +22,7 @@ public:
   tstring() : tstring(nullptr, 0, 0) {}
   tstring(const string& s, size_t pos) : tstring(s.data(), pos, s.size()) {}
   tstring(const string& s) : tstring(s.data(), 0, s.size()) {}
+  explicit tstring(const char* s) : tstring(s, 0, strlen(s)) {}
 
   size_t length() const { return end_pos - pos; }
   size_t size() const { return length(); }

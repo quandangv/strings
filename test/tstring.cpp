@@ -105,8 +105,7 @@ TEST(tstring, cut) {
   NOFAIL(test_cut("' f a i l '",  "'", "'",       " f a i l ", " f a i l '", "' f a i l "));
   NOFAIL(test_cut("\" f ail '",   "'", "'",       "\" f ail '", "\" f ail '", "\" f ail ", true, true, false));
 };
-
-#define TEST_SOURCE "123456"
+constexpr char test_source[] = "123456";
 
 struct substr_test { size_t pos, end_pos, index, length; string result; };
 class SubstrTest : public Test, public WithParamInterface<substr_test> {};
@@ -122,7 +121,7 @@ TEST_P(SubstrTest, substr) {
   auto testset = GetParam();
   tstring str;
   {
-    tstring tmp(TEST_SOURCE, testset.pos, testset.end_pos);
+    tstring tmp(test_source, testset.pos, testset.end_pos);
     str = substr(tmp, testset.index, testset.length);
   }
   EXPECT_EQ((string)str, testset.result);
@@ -143,7 +142,7 @@ vector<erase_test> erase_tests = {
 INSTANTIATE_TEST_SUITE_P(tstring, EraseTest, ValuesIn(erase_tests));
 TEST_P(EraseTest, erase_front_back) {
   auto testset = GetParam();
-  auto reality = tstring(TEST_SOURCE);
+  auto reality = tstring(test_source);
   if (testset.num < 0)
     reality.erase_back(-testset.num);
   else
@@ -163,7 +162,7 @@ vector<erase_mid_test> erase_mid_tests = {
 };
 INSTANTIATE_TEST_SUITE_P(tstring, erase_mid_test_intf, ValuesIn(erase_mid_tests));
 TEST_P(erase_mid_test_intf, erase_mid) {
-  auto src = string(TEST_SOURCE);
+  auto src = string(test_source);
   auto testset = GetParam();
   tstring reality(src);
   reality.erase(src, testset.off, testset.len);
