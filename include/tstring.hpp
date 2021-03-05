@@ -12,7 +12,6 @@ class tstring {
   // This class doesn't copy string data on construction.
   // Thus it will be invalidated as soon as the original string go out of scope
   template<typename T> int compare(const T&) const;
-protected:
   const char* data;
   size_t pos, end_pos;
 public:
@@ -50,6 +49,7 @@ public:
 
   // linear time operations
   void erase(string& source, size_t offset, size_t length = -1);
+  void replace(string& source, size_t pos, size_t length, const string& replacement);
   bool operator==(const tstring& s) const { return compare(s) == 0; }
   bool operator<(const tstring& s) const { return compare(s) < 0; }
   bool operator>(const tstring& s) const { return compare(s) > 0; }

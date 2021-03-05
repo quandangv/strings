@@ -36,6 +36,12 @@ void tstring::erase(string& source, size_t off, size_t length) {
   }
 }
 
+void tstring::replace(string& source, size_t off, size_t length, const string& replacement) {
+  source.replace(pos + off, length, replacement);
+  end_pos += replacement.size() - length;
+  data = source.data();
+}
+
 void tstring::merge(const tstring& other) {
   if (data != other.data)
     throw std::invalid_argument("tstring::merge: The other tstring must point to the same base string");
