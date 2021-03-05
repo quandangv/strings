@@ -8,7 +8,7 @@ TEST(word_char, basic) {
 
 struct get_token_test : public TestWithParam<int> {
   template<int (*Func)(int)>
-  void test(string input, size_t position, string token) {
+  void test(const string& input, size_t position, string token) {
     tstring ts(input, position);
     ASSERT_EQ(token, get_token<Func>(ts));
   }
