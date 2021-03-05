@@ -173,7 +173,7 @@ TEST_P(erase_mid_test_intf, erase_mid) {
 struct find_enclosed_test {
   string source, start_group, false_start, end_group;
   size_t offset, result_start, result_end;
-  bool fail;
+  bool fail{false};
 };
 class find_enclosed_test_intf : public Test, public WithParamInterface<find_enclosed_test> {};
 
