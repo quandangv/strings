@@ -14,7 +14,7 @@ template<int Char>
 tstring get_token(tstring& str);
 
 inline int
-default_token_chars(int c) { return !std::isspace(c) && c != '"' && c != '\''; }
+default_token_chars(int c) { return (!std::isspace(c) && c != '"' && c != '\'') ? 1 : 0; }
 
 inline tstring get_word(tstring& str)
 { return get_token<default_token_chars>(str); }
@@ -35,6 +35,21 @@ int match_char(int c) { return c != Char; }
 template<int Char>
 tstring get_token(tstring& str) {
   return get_token<match_char<Char>>(str);
+}
+
+template<int(*char_func)(int), size_t count>
+int fill_tokens(tstring& str, std::array<tstring, count>& output) {
+  for (size_t i = 0; i < count; i++) {
+    if ((output[i] = get_token<char_func>(str)).untouched())
+      return i;
+  }
+  return count;
+}
+
+
+template<size_t count>
+int fill_tokens(tstring& str, std::array<tstring, count>& output) {
+  return fill_tokens<default_token_chars, count>(str, output);
 }
 
 template<int (*char_func)(int)>
@@ -63,10 +78,10 @@ tstring get_token(tstring& str) {
           return;
       }
     };
-    if (char_func(*ptr)) {
+    if (int char_class = char_func(*ptr)) {
       auto start = ptr - str.begin();
       for(; ptr < end; ptr++) {
-        if (!char_func(*ptr))
+        if (char_class != char_func(*ptr))
           break;
         if (auto type = strchr(open_brackets, *ptr)) {
           match_bracket(close_brackets[type - open_brackets]);
@@ -87,19 +102,4 @@ tstring get_token(tstring& str) {
     }
   }
   return tstring();
-}
-
-template<int(*char_func)(int), size_t count>
-int fill_tokens(tstring& str, std::array<tstring, count>& output) {
-  for (size_t i = 0; i < count; i++) {
-    if ((output[i] = get_token<char_func>(str)).untouched())
-      return i;
-  }
-  return count;
-}
-
-
-template<size_t count>
-int fill_tokens(tstring& str, std::array<tstring, count>& output) {
-  return fill_tokens<default_token_chars, count>(str, output);
 }

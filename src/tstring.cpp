@@ -44,7 +44,7 @@ void tstring::replace(string& source, size_t off, size_t length, const string& r
 
 void tstring::merge(const tstring& other) {
   if (data != other.data)
-    throw std::invalid_argument("tstring::merge: The other tstring must point to the same base string");
+    throw std::invalid_argument("tstring::merge: The other tstring must point to the same base string. This string: " + *this + ", other string: " + other);
   pos = std::min(pos, other.pos);
   end_pos = std::max(end_pos, other.end_pos);
 }
