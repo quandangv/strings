@@ -35,7 +35,7 @@ public:
   char operator[](size_t index) const { return data[pos + index]; }
   tstring interval(size_t start, size_t end) const;
   tstring interval(size_t start) const { return interval(start, end_pos); }
-  void merge(const tstring& other);
+  tstring& merge(const tstring& other);
 
   std::reverse_iterator<const char*> rbegin() const
   { return std::reverse_iterator<const char*>(data + end_pos); }
