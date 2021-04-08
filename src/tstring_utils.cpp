@@ -5,8 +5,8 @@ tstring operator ""_ts(const char* str, size_t len) {
 }
 
 size_t find(const tstring& ts, char ch) {
-  auto result = std::find(ts.begin(), ts.end(), ch);
-  return result == ts.end() ? tstring::npos : result - ts.begin();
+  auto result = (char*)memchr(ts.begin(), ch, ts.size());
+  return result ? result - ts.begin() : tstring::npos;
 }
 
 size_t find(const tstring& ts, const char* str) {
@@ -17,8 +17,8 @@ size_t find(const tstring& ts, const char* str) {
 }
 
 size_t rfind(const tstring& ts, char ch) {
-  auto result = std::find(ts.rbegin(), ts.rend(), ch);
-  return result == ts.rend() ? tstring::npos : result.base() - ts.begin() - 1;
+  auto result = (char*)memrchr(ts.begin(), ch, ts.size());
+  return result ? result - ts.begin() : tstring::npos;
 }
 
 tstring::operator string() const {
